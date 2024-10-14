@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Price Prediction</title>
+    <style>
+        body {
+            background-image: url('https://travel2next.com/wp-content/uploads/rio-at-night.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 50px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            background-color: rgba(76, 175, 80, 0.8);
+            /* Semi-transparent green */
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 20px;
+            width: 300px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: rgba(76, 175, 80, 1);
+            /* Solid green on hover */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to Travel Price Prediction</h1>
+    <div>
+        <a class="button" href="/predict_flight">Predict Flight Price</a>
+        <a class="button" href="/predict_hotel">Predict Hotel Price</a>
+        <a class="button" href="/predict_both">Predict Flight and Hotel Price</a>
+    </div>
+</body>
+
+</html>

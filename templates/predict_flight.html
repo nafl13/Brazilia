@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Flight Price</title>
+    <script>
+        const locations = [
+            "Recife (PE)",
+            "Florianopolis (SC)",
+            "Brasilia (DF)",
+            "Aracaju (SE)",
+            "Salvador (BH)",
+            "Campo Grande (MS)",
+            "Sao Paulo (SP)",
+            "Natal (RN)",
+            "Rio de Janeiro (RJ)"
+        ];
+
+        // Function to set minimum date for the date input
+        function setMinDate() {
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+            const yyyy = today.getFullYear();
+            today = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('date').setAttribute('min', today);
+        }
+
+        function validateSelection() {
+            const fromSelect = document.getElementById('from');
+            const toSelect = document.getElementById('to');
+
+            if (fromSelect.value === toSelect.value) {
+                alert('Please select different locations for "From" and "To".');
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+
+        function updateOptions(selected, otherSelect) {
+            const selectedValue = selected.value;
+            Array.from(otherSelect.options).forEach(option => {
+                option.disabled = option.value === selectedValue;
+            });
+        }
+
+        function submitForm(event) {
+            event.preventDefault(); // Prevent normal form submission
+
+            if (!validateSelection()) return;
+
+            const formData = new FormData(event.target);
+
+            fetch('/predict_flight_price', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    if (data.error) {
+                        resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    } else {
+                        resultDiv.innerHTML = `<p>Expected Flight Price: ${data.flight_price}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Call setMinDate on page load
+        window.onload = setMinDate;
+    </script>
+</head>
+
+<body>
+    <h1>Predict Flight Price</h1>
+    <form id="flightForm" onsubmit="submitForm(event);">
+        <label for="from">From:</label>
+        <select id="from" name="from" onchange="updateOptions(this, document.getElementById('to'));">
+            <option value="" disabled selected>Select</option>
+            <option value="Recife (PE)">Recife (PE)</option>
+            <option value="Florianopolis (SC)">Florianopolis (SC)</option>
+            <option value="Brasilia (DF)">Brasilia (DF)</option>
+            <option value="Aracaju (SE)">Aracaju (SE)</option>
+            <option value="Salvador (BH)">Salvador (BH)</option>
+            <option value="Campo Grande (MS)">Campo Grande (MS)</option>
+            <option value="Sao Paulo (SP)">Sao Paulo (SP)</option>
+            <option value="Natal (RN)">Natal (RN)</option>
+            <option value="Rio de Janeiro (RJ)">Rio de Janeiro (RJ)</option>
+        </select>
+
+        <label for="to">To:</label>
+        <select id="to" name="to" onchange="updateOptions(this, document.getElementById('from'));">
+            <option value="" disabled selected>Select</option>
+            <option value="Recife (PE)">Recife (PE)</option>
+            <option value="Florianopolis (SC)">Florianopolis (SC)</option>
+            <option value="Brasilia (DF)">Brasilia (DF)</option>
+            <option value="Aracaju (SE)">Aracaju (SE)</option>
+            <option value="Salvador (BH)">Salvador (BH)</option>
+            <option value="Campo Grande (MS)">Campo Grande (MS)</option>
+            <option value="Sao Paulo (SP)">Sao Paulo (SP)</option>
+            <option value="Natal (RN)">Natal (RN)</option>
+            <option value="Rio de Janeiro (RJ)">Rio de Janeiro (RJ)</option>
+        </select>
+
+        <label for="flightType">Flight Type:</label>
+        <select id="flightType" name="flightType">
+            <option value="firstClass">First Class</option>
+            <option value="economic">Economic</option>
+            <option value="premium">Premium</option>
+        </select>
+
+        <label for="agency">Agency:</label>
+        <select id="agency" name="agency">
+            <option value="FlyingDrops">FlyingDrops</option>
+            <option value="CloudFy">CloudFy</option>
+            <option value="Rainbow">Rainbow</option>
+        </select>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="result" style="margin-top: 20px;"></div>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Hotel Price</title>
+</head>
+
+<body>
+    <h1>Predict Hotel Price</h1>
+
+    <form id="hotelForm" method="POST">
+        <!-- Place dropdown -->
+        <label for="place">Place:</label>
+        <select name="place" id="place" required>
+            <option value="" disabled selected>Select Place</option>
+            <option value="Florianopolis (SC)">Florianopolis (SC)</option>
+            <option value="Salvador (BH)">Salvador (BH)</option>
+            <option value="Natal (RN)">Natal (RN)</option>
+            <option value="Aracaju (SE)">Aracaju (SE)</option>
+            <option value="Recife (PE)">Recife (PE)</option>
+            <option value="Sao Paulo (SP)">Sao Paulo (SP)</option>
+            <option value="Campo Grande (MS)">Campo Grande (MS)</option>
+            <option value="Rio de Janeiro (RJ)">Rio de Janeiro (RJ)</option>
+            <option value="Brasilia (DF)">Brasilia (DF)</option>
+        </select>
+
+        <!-- Hotel dropdown (auto-populated based on place) -->
+        <label for="hotel">Hotel:</label>
+        <select name="hotel" id="hotel" required>
+            <option value="" disabled selected>Select Hotel</option>
+        </select>
+
+        <!-- Days input -->
+        <label for="days">Days:</label>
+        <input type="number" name="days" id="days" min="1" required>
+
+        <!-- Date input -->
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" required>
+
+        <!-- Submit button -->
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        // Hotel mapping based on place
+        const placeToHotelMap = {
+            'Florianopolis (SC)': ['Hotel A'],
+            'Salvador (BH)': ['Hotel K'],
+            'Natal (RN)': ['Hotel BD'],
+            'Aracaju (SE)': ['Hotel Z'],
+            'Recife (PE)': ['Hotel AU'],
+            'Sao Paulo (SP)': ['Hotel AF'],
+            'Campo Grande (MS)': ['Hotel BW'],
+            'Rio de Janeiro (RJ)': ['Hotel CB'],
+            'Brasilia (DF)': ['Hotel BP']
+        };
+
+        // When the place is selected, populate the corresponding hotel
+        document.getElementById('place').addEventListener('change', function () {
+            const selectedPlace = this.value;
+            const hotelSelect = document.getElementById('hotel');
+            hotelSelect.innerHTML = ''; // Clear previous options
+            hotelSelect.appendChild(new Option("Select Hotel", "", true, true)); // Reset hotel dropdown
+
+            if (selectedPlace && placeToHotelMap[selectedPlace]) {
+                // Add corresponding hotel options
+                placeToHotelMap[selectedPlace].forEach(hotel => {
+                    const hotelOption = new Option(hotel, hotel);
+                    hotelSelect.appendChild(hotelOption);
+                });
+            }
+        });
+
+        // Form submission and result display
+        document.getElementById('hotelForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/predict_hotel_price', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                document.getElementById('result').innerText = `Hotel Price per Day: ${result.predicted_price_per_day}\nTotal Price for ${formData.get('days')} days: ${result.total_price}`;
+            } else {
+                const error = await response.json();
+                document.getElementById('result').innerText = `Error: ${error.error}`;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Flight and Hotel Price</title>
+    <script>
+        // Hotel mapping based on destination (To place)
+        const placeToHotelMap = {
+            'Florianopolis (SC)': ['Hotel A'],
+            'Salvador (BH)': ['Hotel K'],
+            'Natal (RN)': ['Hotel BD'],
+            'Aracaju (SE)': ['Hotel Z'],
+            'Recife (PE)': ['Hotel AU'],
+            'Sao Paulo (SP)': ['Hotel AF'],
+            'Campo Grande (MS)': ['Hotel BW'],
+            'Rio de Janeiro (RJ)': ['Hotel CB'],
+            'Brasilia (DF)': ['Hotel BP']
+        };
+
+        // Set minimum date
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').setAttribute('min', today);
+        }
+
+        // Disable selected option in 'To' if same as 'From'
+        function updateOptions(selected, otherSelect) {
+            const selectedValue = selected.value;
+            Array.from(otherSelect.options).forEach(option => {
+                option.disabled = option.value === selectedValue;
+            });
+        }
+
+        // Validate 'From' and 'To' selection
+        function validateFlightSelection() {
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            if (from === to) {
+                alert('Flight "From" and "To" destinations must be different.');
+                return false;
+            }
+            return true;
+        }
+
+        // Populate hotel options based on 'To' location
+        function populateHotels() {
+            const toLocation = document.getElementById('to').value;
+            const hotelSelect = document.getElementById('hotel');
+            hotelSelect.innerHTML = ''; // Clear previous options
+            hotelSelect.appendChild(new Option("Select Hotel", "", true, true)); // Reset hotel dropdown
+
+            if (toLocation && placeToHotelMap[toLocation]) {
+                placeToHotelMap[toLocation].forEach(hotel => {
+                    hotelSelect.appendChild(new Option(hotel, hotel));
+                });
+            }
+        }
+
+        // Form submission
+        function submitForm(event) {
+            event.preventDefault();
+
+            if (!validateFlightSelection()) return;
+
+            const formData = new FormData(event.target);
+
+            fetch('/predict_both_prices', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    if (data.error) {
+                        resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    } else {
+                        resultDiv.innerHTML = `<p>Expected Flight Price: ${data.flight_price}</p>
+                                               <p>Expected Hotel Price per Day: ${data.predicted_price_per_day}</p>
+                                               <p>Total Hotel Price for ${formData.get('days')} days: ${data.hotel_price_for_days}</p>
+                                               <p>Total Expected Price: ${data.total_price}</p>`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // On page load, set minimum date
+        window.onload = setMinDate;
+    </script>
+</head>
+
+<body>
+    <h1>Predict Flight and Hotel Price</h1>
+
+    <form id="bothForm" onsubmit="submitForm(event);">
+        <!-- Flight Details -->
+        <h2>Flight Details</h2>
+        <label for="from">From:</label>
+        <select id="from" name="from" onchange="updateOptions(this, document.getElementById('to'));" required>
+            <option value="" disabled selected>Select</option>
+            <option value="Recife (PE)">Recife (PE)</option>
+            <option value="Florianopolis (SC)">Florianopolis (SC)</option>
+            <option value="Brasilia (DF)">Brasilia (DF)</option>
+            <option value="Aracaju (SE)">Aracaju (SE)</option>
+            <option value="Salvador (BH)">Salvador (BH)</option>
+            <option value="Campo Grande (MS)">Campo Grande (MS)</option>
+            <option value="Sao Paulo (SP)">Sao Paulo (SP)</option>
+            <option value="Natal (RN)">Natal (RN)</option>
+            <option value="Rio de Janeiro (RJ)">Rio de Janeiro (RJ)</option>
+        </select>
+
+        <label for="to">To:</label>
+        <select id="to" name="to" onchange="updateOptions(this, document.getElementById('from')); populateHotels();"
+            required>
+            <option value="" disabled selected>Select</option>
+            <option value="Recife (PE)">Recife (PE)</option>
+            <option value="Florianopolis (SC)">Florianopolis (SC)</option>
+            <option value="Brasilia (DF)">Brasilia (DF)</option>
+            <option value="Aracaju (SE)">Aracaju (SE)</option>
+            <option value="Salvador (BH)">Salvador (BH)</option>
+            <option value="Campo Grande (MS)">Campo Grande (MS)</option>
+            <option value="Sao Paulo (SP)">Sao Paulo (SP)</option>
+            <option value="Natal (RN)">Natal (RN)</option>
+            <option value="Rio de Janeiro (RJ)">Rio de Janeiro (RJ)</option>
+        </select>
+
+        <label for="flightType">Flight Type:</label>
+        <select id="flightType" name="flightType" required>
+            <option value="firstClass">First Class</option>
+            <option value="economic">Economic</option>
+            <option value="premium">Premium</option>
+        </select>
+
+        <label for="agency">Agency:</label>
+        <select id="agency" name="agency" required>
+            <option value="FlyingDrops">FlyingDrops</option>
+            <option value="CloudFy">CloudFy</option>
+            <option value="Rainbow">Rainbow</option>
+        </select>
+
+        <!-- Hotel Details -->
+        <h2>Hotel Details</h2>
+        <label for="hotel">Hotel:</label>
+        <select id="hotel" name="hotel" required>
+            <option value="" disabled selected>Select Hotel</option>
+        </select>
+
+        <label for="days">Days:</label>
+        <input type="number" id="days" name="days" min="1" required>
+
+        <!-- Common Date Input -->
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="result" style="margin-top: 20px;"></div>
+</body>
+
+</html>

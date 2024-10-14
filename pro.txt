@@ -1,0 +1,6 @@
+ict dsa project
+https://github.com/sachinnpraburaj/Intelligent-Travel-Recommendation-System
+https://www.researchgate.net/publication/370274670_Personalized_Travel_Recommendation_Systems_A_Study_of_Machine_Learning_Approaches_in_Tourism#:~:text=Recommender%20systems%20that%20utilize%20machine%20learning%20algorithms%20are%20a%20prominent
+https://github.com/Nitya01/Travel-Recommendation-System
+https://onlinelibrary.wiley.com/doi/10.1155/2022/1424097#:~:text=The%20proposed%20mining%20and%20filtering%20process%20in%20the%20personalized%20tourism?msockid=2505efffb0d66d3c2691fc79b14a6c29
+https://ckan.publishing.service.gov.uk/dataset/london-tourism-forecasts
